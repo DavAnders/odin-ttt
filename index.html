@@ -8,6 +8,29 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="gameBoard"></div>
+    <form class="player-setup">
+      <input
+        type="text"
+        class="player1-name"
+        placeholder="Player 1 Name"
+        required
+      />
+      <select class="player1-symbol">
+        <option value="X">X</option>
+        <option value="O">O</option>
+      </select>
+      <input
+        type="text"
+        class="player2-name"
+        placeholder="Player 2 Name"
+        required
+      />
+      <select class="player2-symbol">
+        <option value="O">O</option>
+        <option value="X">X</option>
+      </select>
+      <button type="submit">Start Game</button>
+    </form>
+    <div class="game-board"></div>
   </body>
 </html>
