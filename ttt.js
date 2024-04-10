@@ -107,7 +107,8 @@ const GameController = (() => {
       cellElement.textContent = cell;
     });
     document.getElementById("current-player").textContent = `Current Turn: ${
-      getCurrentPlayer().name
+      document.createTextNode(GameController.getCurrentPlayer().name)
+        .textContent
     }`;
   }
 
