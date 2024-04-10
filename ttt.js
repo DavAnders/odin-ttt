@@ -137,17 +137,27 @@ document
 function startGame() {
   GameController.resetGame();
 
-  //click listeners for each cell on the board
   const cells = document.querySelectorAll(".cell");
   cells.forEach((cell, index) => {
-    cell.addEventListener("click", function () {
+    cell.textContent = "";
+    cell.style.pointerEvents = "auto";
+    cells.forEach((c) => c.classList.remove("clicked"));
+
+    cell.onclick = function () {
       if (Gameboard.move(index, GameController.getCurrentPlayer().symbol)) {
+        cell.classList.add("clicked");
+        this.textContent = GameController.getCurrentPlayer().symbol;
+        this.style.pointerEvents = "none";
+
         if (GameController.checkWin()) {
-          alert(`${GameController.getCurrentPlayer().name} wins!`);
-          GameController.resetGame();
+          const resultDisplay = document.getElementById("game-result");
+          resultDisplay.textContent = `${
+            GameController.getCurrentPlayer().name
+          } wins!`;
+          cells.forEach((cell) => (cell.style.pointerEvents = "none"));
         } else if (GameController.checkTie()) {
-          alert("It's a tie!");
-          GameController.resetGame();
+          document.getElementById("game-result").textContent = "It's a tie!";
+          cells.forEach((cell) => (cell.style.pointerEvents = "none"));
         } else {
           GameController.nextTurn();
           document.getElementById(
@@ -157,10 +167,9 @@ function startGame() {
           }`;
         }
       }
-    });
+    };
   });
 
-  // first player's turn initially
   document.getElementById("current-player").textContent = `Current Turn: ${
     GameController.getCurrentPlayer().name
   }`;
