@@ -1,5 +1,5 @@
 const Gameboard = (() => {
-  const board = ["", "", "", "", "", "", "", "", ""];
+  let board = ["", "", "", "", "", "", "", "", ""];
 
   const isValidMove = (index) => board[index] === "";
 
@@ -20,7 +20,7 @@ const Gameboard = (() => {
   const getBoard = () => board;
 
   const reset = () => {
-    board = ["", "", "", "", "", "", "", "", ""];
+    board.fill("");
   };
 
   return {
@@ -35,13 +35,16 @@ const Player = (name, symbol) => {
   return { name, symbol };
 };
 
-const GameController = () => {
+const GameController = (() => {
   const players = [];
   let currentPlayerIndex = 0;
 
   const setPlayers = (name1, symbol1, name2, symbol2) => {
-    players = [Player(name1, symbol1), Player(name2, symbol2)];
+    players[0] = Player(name1, symbol1);
+    players[1] = Player(name2, symbol2);
   };
+
+  const getCurrentPlayer = () => players[currentPlayerIndex];
 
   const checkWin = () => {
     const board = Gameboard.getBoard();
@@ -94,7 +97,71 @@ const GameController = () => {
   const resetGame = () => {
     Gameboard.reset();
     currentPlayerIndex = 0;
+    updateGameDisplay();
   };
 
-  return { setPlayers, checkWin, checkTie, nextTurn, resetGame };
-};
+  function updateGameDisplay() {
+    const board = Gameboard.getBoard();
+    board.forEach((cell, index) => {
+      const cellElement = document.getElementById(`cell-${index}`);
+      cellElement.textContent = cell;
+    });
+    document.getElementById("current-player").textContent = `Current Turn: ${
+      getCurrentPlayer().name
+    }`;
+  }
+
+  return {
+    setPlayers,
+    checkWin,
+    checkTie,
+    nextTurn,
+    resetGame,
+    updateGameDisplay,
+    getCurrentPlayer,
+  };
+})();
+
+document
+  .querySelector(".player-setup")
+  .addEventListener("submit", function (e) {
+    e.preventDefault();
+    const name1 = document.querySelector(".player1-name").value;
+    const symbol1 = document.querySelector(".player1-symbol").value;
+    const name2 = document.querySelector(".player2-name").value;
+    const symbol2 = document.querySelector(".player2-symbol").value;
+    GameController.setPlayers(name1, symbol1, name2, symbol2);
+    startGame();
+  });
+
+function startGame() {
+  GameController.resetGame();
+
+  //click listeners for each cell on the board
+  const cells = document.querySelectorAll(".cell");
+  cells.forEach((cell, index) => {
+    cell.addEventListener("click", function () {
+      if (Gameboard.move(index, GameController.getCurrentPlayer().symbol)) {
+        if (GameController.checkWin()) {
+          alert(`${GameController.getCurrentPlayer().name} wins!`);
+          GameController.resetGame();
+        } else if (GameController.checkTie()) {
+          alert("It's a tie!");
+          GameController.resetGame();
+        } else {
+          GameController.nextTurn();
+          document.getElementById(
+            "current-player"
+          ).textContent = `Current Turn: ${
+            GameController.getCurrentPlayer().name
+          }`;
+        }
+      }
+    });
+  });
+
+  // first player's turn initially
+  document.getElementById("current-player").textContent = `Current Turn: ${
+    GameController.getCurrentPlayer().name
+  }`;
+}
